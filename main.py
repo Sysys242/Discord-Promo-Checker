@@ -11,8 +11,9 @@ def printInfo(text):
     Console.printInfo(text, PrintType.CLEAN)
 
 proxies = itertools.cycle(open("input/0 - proxies.txt", "r").read().splitlines())
-links = itertools.cycle(open("input/0 - link.txt", "r").read().splitlines())
-linksLen = len(open("input/0 - link.txt", "r").read().splitlines())
+links = open("input/0 - link.txt", "r").read().splitlines()
+linksLen = len([ii for n,ii in enumerate(links) if ii not in links[:n]])
+links = itertools.cycle([ii for n,ii in enumerate(links) if ii not in links[:n]])
 
 checked = 0
 
