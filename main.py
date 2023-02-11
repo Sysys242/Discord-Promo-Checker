@@ -21,8 +21,11 @@ def checkCode(code,proxy):
     res = httpx.get("https://discord.com/api/v9/entitlements/gift-codes/" + code +"?country_code=ES&with_application=false&with_subscription_plan=true", proxies="http://" + proxy)
     if res.status_code == 200:
         if res.json()['redeemed'] == False:
-            expiration = str(res.json()['promotion']['inbound_header_text']).split('T')[0]
-            return expiration
+            if res.json()['max_uses'] != res.json()['uses']:
+                expiration = str(res.json()['promotion']['inbound_header_text']).split('T')[0]
+                return expiration
+            else:
+                return "redeemed"
     return "nope"
 
 
@@ -39,12 +42,14 @@ def checkLoop():
             res = checkCode(link.split("https://promos.discord.gg/")[1], proxy)
 
             checked += 1
-            if res != "nope":
-                printSuccess("Valid [" + res + "] [" + link.split("https://promos.discord.gg/")[1] + "]", )
+            if res == "redeemed":
+                printError("Already Used [" + link.split("https://promos.discord.gg/")[1] + "]")
+            elif res == "nope":
+                printError("Invalid [" + link.split("https://promos.discord.gg/")[1] + "]")
+            else:
+                printSuccess("Valid [" + res + "] [" + link.split("https://promos.discord.gg/")[1] + "]")
                 with open("output/valid.txt", "a") as f:
                     f.write(link + " | "  + res + "\n")
-            else:
-                printError("Invalid [" + link.split("https://promos.discord.gg/")[1] + "]")
         except:
             printError("Got an error 💀")
 
